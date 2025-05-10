@@ -1,44 +1,135 @@
 <!DOCTYPE html>
 <html lang="hr">
 <head>
-    <meta charset="UTF-8">
-    <title>Dobrodošlica</title>
+  <meta charset="UTF-8">
+  <title>Dobrodošlica</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f8ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+
+    label, input {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    input {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    input.invalid {
+      border-color: red;
+      background-color: #ffe6e6;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #007BFF;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #ispis {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+
+    #ispis.prikazano {
+      opacity: 1;
+    }
+  </style>
 </head>
 <body>
-    <label for="ime">Ime:</label>
-    <input type="text" id="ime" name="ime">
-    
-    <label for="prezime">Prezime:</label>
-    <input type="text" id="prezime" name="prezime">
-    
-    <button id="gumb">Klikni za dobrodošlicu</button>
 
-    <div id="ispis" style="margin-top: 20px; font-size: 18px; font-weight: bold;"></div>
+<div class="container">
+  <label for="ime">Ime:</label>
+  <input type="text" id="ime" name="ime" placeholder="Unesite ime">
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const imeInput = document.getElementById('ime');
-            const prezimeInput = document.getElementById('prezime');
-            const gumb = document.getElementById('gumb');
-            const ispis = document.getElementById('ispis');
+  <label for="prezime">Prezime:</label>
+  <input type="text" id="prezime" name="prezime" placeholder="Unesite prezime">
 
-            function velikaSlova(tekst) {
-                return tekst.charAt(0).toUpperCase() + tekst.slice(1).toLowerCase();
-            }
+  <button id="gumb">Klikni za dobrodošlicu</button>
 
-            function prikaziPoruku() {
-                const ime = velikaSlova(imeInput.value.trim());
-                const prezime = velikaSlova(prezimeInput.value.trim());
+  <div id="ispis"></div>
+</div>
 
-                if (ime && prezime) {
-                    ispis.textContent = `Dobro došli ${ime} ${prezime}!`;
-                } else {
-                    ispis.textContent = "Molimo unesite i ime i prezime.";
-                }
-            }
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const imeInput = document.getElementById('ime');
+    const prezimeInput = document.getElementById('prezime');
+    const gumb = document.getElementById('gumb');
+    const ispis = document.getElementById('ispis');
 
-            gumb.addEventListener('click', prikaziPoruku);
-        });
-    </script>
+    // Funkcija za veliko početno slovo
+    const velikaSlova = tekst => 
+      tekst.charAt(0).toUpperCase() + tekst.slice(1).toLowerCase();
+
+    function prikaziPoruku() {
+      const ime = velikaSlova(imeInput.value.trim());
+      const prezime = velikaSlova(prezimeInput.value.trim());
+
+      let validno = true;
+
+      // Resetiraj stilove
+      imeInput.classList.remove('invalid');
+      prezimeInput.classList.remove('invalid');
+      ispis.classList.remove('prikazano');
+
+      // Provjera unosa
+      if (!ime) {
+        imeInput.classList.add('invalid');
+        imeInput.focus();
+        validno = false;
+      }
+
+      if (!prezime) {
+        prezimeInput.classList.add('invalid');
+        if (validno) prezimeInput.focus();
+        validno = false;
+      }
+
+      if (validno) {
+        ispis.textContent = `Dobro došli ${ime} ${prezime}!`;
+        ispis.classList.add('prikazano');
+      } else {
+        ispis.textContent = "Molimo unesite i ime i prezime.";
+        ispis.classList.add('prikazano');
+      }
+    }
+
+    gumb.addEventListener('click', prikaziPoruku);
+  });
+</script>
+
 </body>
 </html>

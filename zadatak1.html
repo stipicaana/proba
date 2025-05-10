@@ -4,48 +4,104 @@
   <meta charset="UTF-8">
   <title>Dodavanje teksta i HTML-a</title>
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
     button {
       margin: 5px;
+      padding: 8px 12px;
+      cursor: pointer;
+      background-color: #007BFF;
+      border: none;
+      color: white;
+      border-radius: 5px;
     }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
     #kopirano {
-      margin-top: 10px;
+      margin-top: 15px;
       border: 1px solid gray;
       padding: 10px;
+      background-color: #f9f9f9;
+      transition: background-color 0.5s;
+    }
+
+    @media (max-width: 600px) {
+      button {
+        display: block;
+        width: 100%;
+      }
+    }
+
+    .opis {
+      font-size: 0.9em;
+      color: gray;
+      margin-bottom: 15px;
     }
   </style>
 </head>
 <body>
 
+<h2>Prikaz teksta s različitim metodama</h2>
+
+<div class="opis">Klikom na gumbe ispod možete kopirati tekst iz elementa s ID-em <code>test</code> na različite načine.</div>
+
 <div id="test">
   Ovo je neki <strong>podebljan</strong> i <em>nakošen</em> tekst.
 </div>
 
-<button onclick="dodajInnerText()">Metoda text</button>
-<button onclick="dodajInnerHTML()">Metoda html</button>
-<button onclick="appendText()">Metoda append text</button>
-<button onclick="appendHTML()">Metoda append html</button>
+<button id="btnText">Metoda text</button>
+<button id="btnHtml">Metoda html</button>
+<button id="btnAppendText">Dodaj text</button>
+<button id="btnAppendHtml">Dodaj html</button>
+<button id="btnClear">Očisti</button>
 
 <p id="kopirano"></p>
 
 <script>
-  function dodajInnerText() {
-    const cistiText = document.getElementById("test").innerText;
-    document.getElementById("kopirano").innerText = cistiText;
-  }
+  const testDiv = document.getElementById("test");
+  const output = document.getElementById("kopirano");
 
-  function dodajInnerHTML() {
-    const cistiHTML = document.getElementById("test").innerHTML;
-    document.getElementById("kopirano").innerHTML = cistiHTML;
-  }
+  // innerText zamjena
+  document.getElementById("btnText").addEventListener("click", () => {
+    output.innerText = testDiv.innerText;
+    highlightOutput();
+  });
 
-  function appendText() {
-    const cistiText = document.getElementById("test").innerText;
-    document.getElementById("kopirano").innerText += " " + cistiText;
-  }
+  // innerHTML zamjena
+  document.getElementById("btnHtml").addEventListener("click", () => {
+    output.innerHTML = testDiv.innerHTML;
+    highlightOutput();
+  });
 
-  function appendHTML() {
-    const cistiHTML = document.getElementById("test").innerHTML;
-    document.getElementById("kopirano").innerHTML += " " + cistiHTML;
+  // dodavanje plain texta
+  document.getElementById("btnAppendText").addEventListener("click", () => {
+    output.innerText += " " + testDiv.innerText;
+    highlightOutput();
+  });
+
+  // dodavanje HTML koda
+  document.getElementById("btnAppendHtml").addEventListener("click", () => {
+    output.innerHTML += " " + testDiv.innerHTML;
+    highlightOutput();
+  });
+
+  // brisanje sadržaja
+  document.getElementById("btnClear").addEventListener("click", () => {
+    output.innerHTML = "";
+  });
+
+  // lagana animacija pozadine kod promjene
+  function highlightOutput() {
+    output.style.backgroundColor = "#e0f7fa";
+    setTimeout(() => {
+      output.style.backgroundColor = "#f9f9f9";
+    }, 500);
   }
 </script>
 
