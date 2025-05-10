@@ -2,107 +2,199 @@
 <html lang="hr">
 <head>
   <meta charset="UTF-8">
-  <title>Dodavanje teksta i HTML-a</title>
+  <title>Napredni Webshop</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 30px auto;
       padding: 20px;
+      background-color: #f2f2f2;
+      border-radius: 10px;
     }
 
-    button {
-      margin: 5px;
-      padding: 8px 12px;
-      cursor: pointer;
-      background-color: #007BFF;
-      border: none;
-      color: white;
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .proizvod {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 10px;
+      background-color: #fff;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+    }
+
+    .proizvod img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
       border-radius: 5px;
     }
 
-    button:hover {
-      background-color: #0056b3;
+    input[type="number"] {
+      width: 60px;
+      padding: 5px;
     }
 
-    #kopirano {
+    .gumbi, .sort {
+      display: flex;
+      justify-content: space-between;
       margin-top: 15px;
-      border: 1px solid gray;
+    }
+
+    button, select {
       padding: 10px;
-      background-color: #f9f9f9;
-      transition: background-color 0.5s;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      border: none;
     }
 
-    @media (max-width: 600px) {
-      button {
-        display: block;
-        width: 100%;
-      }
+    button {
+      background-color: #28a745;
+      color: white;
     }
 
-    .opis {
-      font-size: 0.9em;
-      color: gray;
-      margin-bottom: 15px;
+    button:hover {
+      background-color: #218838;
+    }
+
+    #rezultat {
+      margin-top: 20px;
+      font-weight: bold;
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
 <body>
 
-<h2>Prikaz teksta s različitim metodama</h2>
+<h2>Webshop</h2>
 
-<div class="opis">Klikom na gumbe ispod možete kopirati tekst iz elementa s ID-em <code>test</code> na različite načine.</div>
-
-<div id="test">
-  Ovo je neki <strong>podebljan</strong> i <em>nakošen</em> tekst.
+<div class="sort">
+  <label for="sortiraj">Sortiraj po: </label>
+  <select id="sortiraj">
+    <option value="naziv">Nazivu</option>
+    <option value="cijena">Cijeni</option>
+  </select>
 </div>
 
-<button id="btnText">Metoda text</button>
-<button id="btnHtml">Metoda html</button>
-<button id="btnAppendText">Dodaj text</button>
-<button id="btnAppendHtml">Dodaj html</button>
-<button id="btnClear">Očisti</button>
+<div id="listaProizvoda"></div>
 
-<p id="kopirano"></p>
+<div class="gumbi">
+  <button onclick="resetiraj()">Resetiraj</button>
+</div>
+
+<div id="rezultat"></div>
 
 <script>
-  const testDiv = document.getElementById("test");
-  const output = document.getElementById("kopirano");
+  const proizvodi = [
+    { naziv: "Majica", cijena: 10, slika: "https://via.placeholder.com/80?text=Majica" },
+    { naziv: "Hlače", cijena: 20, slika: "https://via.placeholder.com/80?text=Hlače" },
+    { naziv: "Tenisice", cijena: 50, slika: "https://via.placeholder.com/80?text=Tenisice" },
+    { naziv: "Šešir", cijena: 5, slika: "https://via.placeholder.com/80?text=Šešir" }
+  ];
 
-  // innerText zamjena
-  document.getElementById("btnText").addEventListener("click", () => {
-    output.innerText = testDiv.innerText;
-    highlightOutput();
-  });
-
-  // innerHTML zamjena
-  document.getElementById("btnHtml").addEventListener("click", () => {
-    output.innerHTML = testDiv.innerHTML;
-    highlightOutput();
-  });
-
-  // dodavanje plain texta
-  document.getElementById("btnAppendText").addEventListener("click", () => {
-    output.innerText += " " + testDiv.innerText;
-    highlightOutput();
-  });
-
-  // dodavanje HTML koda
-  document.getElementById("btnAppendHtml").addEventListener("click", () => {
-    output.innerHTML += " " + testDiv.innerHTML;
-    highlightOutput();
-  });
-
-  // brisanje sadržaja
-  document.getElementById("btnClear").addEventListener("click", () => {
-    output.innerHTML = "";
-  });
-
-  // lagana animacija pozadine kod promjene
-  function highlightOutput() {
-    output.style.backgroundColor = "#e0f7fa";
-    setTimeout(() => {
-      output.style.backgroundColor = "#f9f9f9";
-    }, 500);
+  function spremiStanje() {
+    const podaci = [];
+    document.querySelectorAll('.proizvod').forEach(div => {
+      const checkbox = div.querySelector('input[type="checkbox"]');
+      const kolicina = div.querySelector('input[type="number"]').value;
+      podaci.push({ checked: checkbox.checked, kolicina });
+    });
+    localStorage.setItem("stanjeWebshop", JSON.stringify(podaci));
   }
+
+  function ucitajStanje() {
+    const podaci = JSON.parse(localStorage.getItem("stanjeWebshop"));
+    if (!podaci) return;
+    document.querySelectorAll('.proizvod').forEach((div, i) => {
+      const checkbox = div.querySelector('input[type="checkbox"]');
+      const kolicina = div.querySelector('input[type="number"]');
+      checkbox.checked = podaci[i].checked;
+      kolicina.value = podaci[i].kolicina;
+    });
+  }
+
+  function prikaziProizvode() {
+    const sortirajPo = document.getElementById("sortiraj").value;
+    const sortirano = [...proizvodi];
+
+    sortirano.sort((a, b) => {
+      if (sortirajPo === "cijena") return a.cijena - b.cijena;
+      else return a.naziv.localeCompare(b.naziv);
+    });
+
+    const lista = document.getElementById("listaProizvoda");
+    lista.innerHTML = "";
+
+    sortirano.forEach((proizvod, i) => {
+      const div = document.createElement("div");
+      div.className = "proizvod";
+      div.innerHTML = `
+        <img src="${proizvod.slika}" alt="${proizvod.naziv}">
+        <label><input type="checkbox" class="artikl" data-cijena="${proizvod.cijena}" data-naziv="${proizvod.naziv}"> ${proizvod.naziv} (${proizvod.cijena} €)</label>
+        Količina: <input type="number" min="1" value="1" class="kolicina">
+      `;
+      lista.appendChild(div);
+    });
+
+    dodajEvente();
+    ucitajStanje();
+    izračunaj();
+  }
+
+  function dodajEvente() {
+    document.querySelectorAll('input').forEach(el => {
+      el.addEventListener('input', () => {
+        izračunaj();
+        spremiStanje();
+      });
+    });
+  }
+
+  function izračunaj() {
+    const artikli = document.querySelectorAll('.artikl');
+    const kolicine = document.querySelectorAll('.kolicina');
+    let ukupno = 0;
+    let odabrani = [];
+
+    artikli.forEach((artikl, i) => {
+      if (artikl.checked) {
+        const naziv = artikl.getAttribute('data-naziv');
+        const cijena = parseFloat(artikl.getAttribute('data-cijena'));
+        const kol = parseInt(kolicine[i].value);
+        if (kol > 0) {
+          ukupno += cijena * kol;
+          odabrani.push(`${naziv} x ${kol}`);
+        }
+      }
+    });
+
+    const ispis = document.getElementById('rezultat');
+    if (odabrani.length > 0) {
+      ispis.innerHTML = `Kupili ste: ${odabrani.join(", ")}<br>Ukupno: ${ukupno.toFixed(2)} €`;
+    } else {
+      ispis.textContent = "Niste odabrali nijedan proizvod.";
+    }
+  }
+
+  function resetiraj() {
+    document.querySelectorAll('.artikl').forEach(cb => cb.checked = false);
+    document.querySelectorAll('.kolicina').forEach(inp => inp.value = 1);
+    localStorage.removeItem("stanjeWebshop");
+    izračunaj();
+  }
+
+  document.getElementById("sortiraj").addEventListener("change", prikaziProizvode);
+  window.addEventListener("load", prikaziProizvode);
 </script>
 
 </body>
